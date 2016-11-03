@@ -1,8 +1,8 @@
 #lang typed/racket
 
 (struct Fun ([name : Id]
-             [args : (List Id)]
-             [locals : (List Id)]
+             [args : (Listof Id)]
+             [locals : (Listof Id)]
              [body : Stmt]
              [ret : Expr]))
 
@@ -12,7 +12,8 @@
                      App AddrOf Malloc DeRef
                      Null))
 
-(struct App ([fun : Id] [args : (List Expr)]))
+(struct App ([fun : Expr] [args : (Listof Expr)]))
+
 (define-type Id Symbol)
 (define-type Int Integer)
 (struct Plus ([lhs : Expr] [rhs : Expr]))
@@ -32,9 +33,28 @@
                      If NoOp While))
 (struct Assign ([id : (U Id DeRef)] [e : Expr]))
 (struct Output ([e : Expr]))
-(struct Seq ([stmts : (List Stmt)]))
+(struct Seq ([stmts : (Listof Stmt)]))
 (struct If ([cnd : Expr] [thn : Stmt] [els : Stmt]))
 (struct NoOp ())
 (struct While ([cnd : Expr] [body : Stmt]))
 
-(define-type Program (List Fun))
+(define-type Program (Listof Fun))
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Example programs
+
+(define rec '(rec (n)
+               (var f)
+               (if (== n 0)
+                   (:= f 1)
+                   (:= f (* n (rec (- n 1)))))
+               (return f)))
+
+(define frec (Fun 'rec '(n) '(f)
+                  (If (Equal 'n 0)
+                      (Assign 'f 1)
+                      (Assign 'f (Mult 'n (App 'rec (list (Minus 'n 1))))))
+                  'f))
+
+

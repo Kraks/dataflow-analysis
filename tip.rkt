@@ -1,5 +1,7 @@
 #lang typed/racket
 
+(provide (all-defined-out))
+
 (struct Fun ([name : Id]
              [args : (Listof Id)]
              [locals : (Listof Id)]

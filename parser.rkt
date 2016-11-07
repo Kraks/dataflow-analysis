@@ -3,6 +3,7 @@
 (require "tip.rkt")
 (require rackunit)
 
+; sexp -> Stmt
 (define (parse-stmt s)
   (match s
     [`(:= ,(? symbol? id) ,e) (Assign id (parse-expr e))]
@@ -19,6 +20,7 @@
      (Seq (map parse-stmt (cons fst rest)))]
     [else (error 'parse-stmt "can not parse statement")]))
 
+; sexp -> Expr
 (define (parse-expr e)
   (match e
     [(? symbol? s) s]
@@ -43,10 +45,13 @@
                             (map parse-expr args))]
     [else (error 'parse-expr "can not parse expression")]))
 
+; sexp -> Return
 (define (parse-ret r)
   (match r
-    [`(return ,e) (Return (parse-expr e))]))
+    [`(return ,e) (Return (parse-expr e))]
+    [else (error 'parse-ret "can not parse ret")]))
 
+; sexp -> Fun
 (define (parse-function f)
   (match f
     [`(,fname (,vars ...) (var ,locals ...)

@@ -1,5 +1,7 @@
 #lang typed/racket
 
+;; AST of TIP language
+
 (provide (all-defined-out))
 
 (struct Return ([e : Expr]) #:transparent)

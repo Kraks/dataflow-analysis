@@ -1,6 +1,9 @@
 #lang typed/racket
 
 ;; Intraprocedure control flow graph, transformed from AST
+;; Control flow graph
+;; Node represents statement
+;; Edge represents control flow
 
 (require "tip.rkt")
 

@@ -1,7 +1,9 @@
 #lang racket
 
-(require "tip.rkt")
+;; Parser of TIP language, converts s-exp to ast
+
 (require rackunit)
+(require "tip.rkt")
 
 ; sexp -> Stmt
 (define (parse-stmt s)
@@ -54,8 +56,7 @@
 ; sexp -> Fun
 (define (parse-function f)
   (match f
-    [`(,fname (,vars ...) (var ,locals ...)
-              ,stmt ,ret)
+    [`(,fname (,vars ...) (var ,locals ...) ,stmt ,ret)
      (Fun fname vars locals (parse-stmt stmt) (parse-ret ret))]
     [else (error 'parse-function "can not parse function")]))
 

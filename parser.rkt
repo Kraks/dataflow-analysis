@@ -69,7 +69,9 @@
               (If (Equal 'a 'b)
                   (list (Assign 'a 3) (Assign 'b 4))
                   (list (Assign (DeRef 'a) 4) (Assign 'a 3))))
-
+(check-equal? (parse-stmt '(while (> x 0)
+                                  (:= x (- x 1))))
+              (While (Greater 'x 0) (Assign 'x (Minus 'x 1))))
 
 (define rec '(rec (n)
                (var f)

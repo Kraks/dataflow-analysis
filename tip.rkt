@@ -4,12 +4,10 @@
 
 (provide (all-defined-out))
 
-(struct Return ([e : Expr]) #:transparent)
 (struct Fun ([name : Id]
              [args : (Listof Id)]
              [locals : (Listof Id)]
-             [body : Stmt]
-             [ret : Return])
+             [body : (U Stmt (Listof Stmt))])
   #:transparent)
 
 (define-type Expr (U Int Id Plus
@@ -37,13 +35,12 @@
 (struct DeRef ([e : Expr]) #:transparent)
 (struct Null ())
 
-(define-type Stmt (U Assign Output Seq
-                     If NoOp While))
+(define-type Stmt (U Assign Output If NoOp While Return (Listof Stmt)))
+(struct NoOp ())
 (struct Assign ([id : (U Id DeRef)] [e : Expr]) #:transparent)
 (struct Output ([e : Expr]) #:transparent)
-(struct Seq ([stmts : (Listof Stmt)]) #:transparent)
 (struct If ([cnd : Expr] [thn : Stmt] [els : Stmt]) #:transparent)
-(struct NoOp ())
 (struct While ([cnd : Expr] [body : Stmt]) #:transparent)
+(struct Return ([e : Expr]) #:transparent)
 
 (define-type Program (Listof Fun))

@@ -18,8 +18,9 @@
     [`(while ,cnd ,body) (While (parse-expr cnd)
                                 (parse-stmt body))]
     [`(noop) (NoOp)]
-    [(list fst rest ...)
-     (Seq (map parse-stmt (cons fst rest)))]
+    [`(return ,e) (Return (parse-expr e))]
+    [`(,stmts ...)
+     (map parse-stmt stmts)]
     [else (error 'parse-stmt "can not parse statement")]))
 
 ; sexp -> Expr
@@ -38,7 +39,7 @@
     [`(> ,lhs ,rhs) (Greater (parse-expr lhs)
                              (parse-expr rhs))]
     [`(== ,lhs ,rhs) (Equal (parse-expr lhs)
-                              (parse-expr rhs))]
+                            (parse-expr rhs))]
     [`(input) (Input)]
     [`(null) (Null)]
     [`(& ,(? symbol? id)) (AddrOf id)]
@@ -47,17 +48,11 @@
                             (map parse-expr args))]
     [else (error 'parse-expr "can not parse expression")]))
 
-; sexp -> Return
-(define (parse-ret r)
-  (match r
-    [`(return ,e) (Return (parse-expr e))]
-    [else (error 'parse-ret "can not parse ret")]))
-
 ; sexp -> Fun
 (define (parse-function f)
   (match f
-    [`(,fname (,vars ...) (var ,locals ...) ,stmt ,ret)
-     (Fun fname vars locals (parse-stmt stmt) (parse-ret ret))]
+    [`(,fname (,vars ...) (var ,locals ...) ,stmts)
+     (Fun fname vars locals (parse-stmt stmts))]
     [else (error 'parse-function "can not parse function")]))
 
 ;;;;;;;;;;;;;;;;;
@@ -65,25 +60,32 @@
 (check-equal? (parse-stmt '(while (== 1 2) (output 3)))
               (While (Equal 1 2) (Output 3)))
 (check-equal? (parse-stmt '((:= a 3)))
-              (Seq (list (Assign 'a 3))))
+              (list (Assign 'a 3)))
 (check-equal? (parse-stmt '((:= a 3) (:= b 4) (:= c (+ a b))))
-              (Seq (list (Assign 'a 3) (Assign 'b 4) (Assign 'c (Plus 'a 'b)))))
+              (list (Assign 'a 3) (Assign 'b 4) (Assign 'c (Plus 'a 'b))))
 (check-equal? (parse-stmt '(if (== a b)
                                ((:= a 3) (:= b 4))
                                ((:= (* a) 4) (:= a 3))))
               (If (Equal 'a 'b)
-                  (Seq (list (Assign 'a 3) (Assign 'b 4)))
-                  (Seq (list (Assign (DeRef 'a) 4) (Assign 'a 3)))))
+                  (list (Assign 'a 3) (Assign 'b 4))
+                  (list (Assign (DeRef 'a) 4) (Assign 'a 3))))
+
 
 (define rec '(rec (n)
                (var f)
-               (if (== n 0)
-                   (:= f 1)
-                   (:= f (* n (rec (- n 1)))))
-               (return f)))
+               ((if (== n 0)
+                    (:= f 1)
+                    (:= f (* n (rec (- n 1)))))
+                (return f))))
 (define frec (Fun 'rec '(n) '(f)
-                  (If (Equal 'n 0)
-                      (Assign 'f 1)
-                      (Assign 'f (Mult 'n (App 'rec (list (Minus 'n 1))))))
-                  (Return 'f)))
+                  (list
+                   (If (Equal 'n 0)
+                       (Assign 'f 1)
+                       (Assign 'f (Mult 'n (App 'rec (list (Minus 'n 1))))))
+                   (Return 'f))))
 (check-equal? (parse-function rec) frec)
+
+(check-equal? (parse-function '(add (x y)
+                                    (var)
+                                    (return (+ x y))))
+              (Fun 'add '(x y) '() (Return (Plus 'x 'y))))

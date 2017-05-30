@@ -5,7 +5,7 @@
 ;; Node represents statement
 ;; Edge represents a directed control flow
 
-(require "tip.rkt")
+(require "ast.rkt")
 (require "parser.rkt")
 (require rackunit)
 

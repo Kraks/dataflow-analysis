@@ -3,7 +3,7 @@
 ;; Parser of TIP language, converts s-exp to AST
 
 (require rackunit)
-(require "tip.rkt")
+(require "ast.rkt")
 
 (provide (all-defined-out))
 

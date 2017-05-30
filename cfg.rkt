@@ -65,6 +65,8 @@
 (define (get-preds n cfg)
   (map Edge-from (filter (λ (e) (equal? (Edge-to e) n)) (CFG-edges cfg))))
 
+
+
 (module+ test
   (check-match (stmt->cfg (parse-stmt '{:= a 3}))
                 (CFG (Node (Assign 'a 3) _)
@@ -192,4 +194,25 @@
                   (Edge
                    (Node (Assign (DeRef 'q) (Minus (DeRef 'q) 1)) _)
                    (Node (Assign 'f (Mult (DeRef 'p) (App (DeRef 'x) '(q x)))) _) _))))
+
+  (let ([cfg (stmt->cfg (parse-stmt '{{if {== x 1} {:= a 1} {:= b 2}}}))])
+    (check-match (get-succs (CFG-entry cfg) cfg)
+                 (list (Node (Assign 'a 1) _) (Node (Assign 'b 2) _)))
+    (check-match (get-preds (CFG-exit cfg) cfg)
+                 (list (Node (Assign 'a 1) _) (Node (Assign 'b 2) _))))
+
+  (let ([cfg (stmt->cfg (parse-stmt '{while {> 5 x}
+                                            {{if {== x 3}
+                                                 {:= x 4}
+                                                 {:= x 5}}
+                                             {:= x {- x 1}}}}))])
+    (check-match (get-succs (CFG-exit cfg) cfg)
+                 (list (Node (Greater 5 'x) _)))
+    (check-match (get-preds (CFG-exit cfg) cfg)
+                 (list (Node (NoOp) _)))
+    (check-match (get-succs (CFG-entry cfg) cfg)
+                 (list (Node (Equal 'x 3) _)))
+    (check-match (get-preds (car (get-preds (CFG-exit cfg) cfg)) cfg)
+                 (list (Node (Assign 'x 4) _)
+                       (Node (Assign 'x 5) _))))
   )

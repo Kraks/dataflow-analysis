@@ -25,6 +25,7 @@
 ; sexp -> Expr
 (define (parse-expr e)
   (match e
+    [(? boolean? b) b]
     [(? symbol? s) s]
     [(? integer? i) i]
     [`{+ ,lhs ,rhs} (Plus (parse-expr lhs)

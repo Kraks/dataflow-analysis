@@ -2,9 +2,6 @@
 
 ;; AST of TIP language
 
-;; TODO: handle literal bool and int value
-;; TODO: parse Id
-
 (provide (all-defined-out))
 
 (struct Fun (name args locals body) #:transparent)
@@ -15,9 +12,6 @@ Expr ::= Int | Bool | Var | Plus | Minus | Mult | Div |
          Greater | Equal | Input | App |
          AddrOf | Malloc | DeRef | Null
 |#
-
-;(struct LitInt (i) #:transparent)
-;(struct Id (var) #:transparent)
 
 (struct Plus (lhs rhs) #:transparent)
 (struct Minus (lhs rhs) #:transparent)

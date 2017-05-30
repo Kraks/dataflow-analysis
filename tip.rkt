@@ -1,46 +1,52 @@
-#lang typed/racket
+#lang racket
 
 ;; AST of TIP language
 
+;; TODO: handle literal bool and int value
+;; TODO: parse Id
+
 (provide (all-defined-out))
 
-(struct Fun ([name : Id]
-             [args : (Listof Id)]
-             [locals : (Listof Id)]
-             [body : (U Stmt (Listof Stmt))])
-  #:transparent)
+(struct Fun (name args locals body) #:transparent)
 
-(define-type Expr (U Int Id Plus
-                     Minus Mult Div
-                     Greater Equal Input
-                     App AddrOf Malloc DeRef
-                     Null))
+#|
+Var ::= Symbol
+Expr ::= Int | Bool | Var | Plus | Minus | Mult | Div |
+         Greater | Equal | Input | App |
+         AddrOf | Malloc | DeRef | Null
+|#
 
-(define-type Id Symbol)
-(define-type Int Integer)
+;(struct LitInt (i) #:transparent)
+;(struct Id (var) #:transparent)
 
-(struct Plus ([lhs : Expr] [rhs : Expr]) #:transparent)
-(struct Minus ([lhs : Expr] [rhs : Expr]) #:transparent)
-(struct Mult ([lhs : Expr] [rhs : Expr]) #:transparent)
-(struct Div ([lhs : Expr] [rhs : Expr]) #:transparent)
-(struct Greater ([lhs : Expr] [rhs : Expr]) #:transparent)
-(struct Equal ([lhs : Expr] [rhs : Expr]) #:transparent)
+(struct Plus (lhs rhs) #:transparent)
+(struct Minus (lhs rhs) #:transparent)
+(struct Mult (lhs rhs) #:transparent)
+(struct Div (lhs rhs) #:transparent)
+(struct Greater (lhs rhs) #:transparent)
+(struct Equal (lhs rhs) #:transparent)
 
-(struct Input ())
+(struct Input () #:transparent)
+(struct App (fun args) #:transparent)
+(struct AddrOf (var) #:transparent)
+(struct Malloc () #:transparent)
+(struct DeRef (e) #:transparent)
+(struct Null () #:transparent)
 
-(struct App ([fun : Expr] [args : (Listof Expr)]) #:transparent)
+#|
+Stmt ::= NoOp | Output | Return | While | Assign | If | Stmt*
+|#
 
-(struct AddrOf ([var : Id]) #:transparent)
-(struct Malloc ())
-(struct DeRef ([e : Expr]) #:transparent)
-(struct Null ())
+(struct NoOp () #:transparent)
+(struct Output (expr) #:transparent)
+(struct Return (expr) #:transparent)
+(struct While (cnd body) #:transparent)
+(struct Assign (id e) #:transparent)
+(struct If (cnd thn els) #:transparent)
+(struct Seq (stmts) #:transparent)
 
-(define-type Stmt (U Assign Output If NoOp While Return (Listof Stmt)))
-(struct NoOp ())
-(struct Assign ([id : (U Id DeRef)] [e : Expr]) #:transparent)
-(struct Output ([e : Expr]) #:transparent)
-(struct If ([cnd : Expr] [thn : Stmt] [els : Stmt]) #:transparent)
-(struct While ([cnd : Expr] [body : Stmt]) #:transparent)
-(struct Return ([e : Expr]) #:transparent)
+#|
+Program ::= Fun*
+|#
 
-(define-type Program (Listof Fun))
+(struct Program (funs))

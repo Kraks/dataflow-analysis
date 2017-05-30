@@ -65,8 +65,6 @@
 (define (get-preds n cfg)
   (map Edge-from (filter (λ (e) (equal? (Edge-to e) n)) (CFG-edges cfg))))
 
-
-
 (module+ test
   (check-match (stmt->cfg (parse-stmt '{:= a 3}))
                 (CFG (Node (Assign 'a 3) _)

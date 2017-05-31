@@ -9,52 +9,61 @@
 (require "parser.rkt")
 (require rackunit)
 
+(provide (all-defined-out))
+
 (struct Node (body label) #:transparent)
 (struct Edge (from to label) #:transparent)
 (struct CFG (entry exit nodes edges) #:transparent)
 
-(define (make-node body [label (gensym 'node)])
-  (Node body label))
-
-(define (make-edge from to [label (gensym 'edge)])
-  (Edge from to label))
-
 (define (stmt->cfg stmt)
-  (match stmt
-    [(If cnd thn els)
-     (define thn-cfg (stmt->cfg thn))
-     (define els-cfg (stmt->cfg els))
-     (define entry (make-node cnd))
-     (define exit (make-node (NoOp)))
-     (CFG entry exit
-          (append (list entry exit)
-                  (CFG-nodes thn-cfg)
-                  (CFG-nodes els-cfg))
-          (append (list (make-edge entry (CFG-entry thn-cfg))
-                        (make-edge entry (CFG-entry els-cfg))
-                        (make-edge (CFG-exit thn-cfg) exit)
-                        (make-edge (CFG-exit els-cfg) exit))
-                  (CFG-edges thn-cfg)
-                  (CFG-edges els-cfg)))]
-    [(While cnd body)
-     (define body-cfg (stmt->cfg body))
-     (define entry (make-node cnd))
-     (define es (list (make-edge entry (CFG-entry body-cfg))
-                      (make-edge (CFG-exit body-cfg) entry)))
-     (CFG entry (CFG-exit body-cfg)
-          (cons entry (CFG-nodes body-cfg))
-          (append es (CFG-edges body-cfg)))]
-    [(Seq stmts)
-     (define cfgs (map stmt->cfg stmts))
-     (define entry (CFG-entry (first cfgs)))
-     (define exit (CFG-exit (last cfgs)))
-     (define conns (for/list ([exit cfgs]
-                              [entry (cdr cfgs)])
-                     (make-edge (CFG-exit exit) (CFG-entry entry))))
-     (define all-nodes (foldl (λ (c acc) (append (CFG-nodes c) acc)) '() cfgs))
-     (define all-edges (foldl (λ (c acc) (append (CFG-edges c) acc)) '() cfgs))
-     (CFG entry exit all-nodes (append conns all-edges))]
-    [else (let ([n (make-node stmt)]) (CFG n n (list n) '()))]))
+  (define node-id 1)
+  (define edge-id 1)
+  
+  (define (make-node body [label node-id])
+    (set! node-id (add1 node-id))
+    (Node body label))
+
+  (define (make-edge from to [label edge-id])
+    (set! edge-id (add1 edge-id))
+    (Edge from to label))
+  
+  (define (cfg-helper stmt)
+    (match stmt
+      [(If cnd thn els)
+       (define thn-cfg (cfg-helper thn))
+       (define els-cfg (cfg-helper els))
+       (define entry (make-node cnd))
+       (define exit (make-node (NoOp)))
+       (CFG entry exit
+            (append (list entry exit)
+                    (CFG-nodes thn-cfg)
+                    (CFG-nodes els-cfg))
+            (append (list (make-edge entry (CFG-entry thn-cfg))
+                          (make-edge entry (CFG-entry els-cfg))
+                          (make-edge (CFG-exit thn-cfg) exit)
+                          (make-edge (CFG-exit els-cfg) exit))
+                    (CFG-edges thn-cfg)
+                    (CFG-edges els-cfg)))]
+      [(While cnd body)
+       (define body-cfg (cfg-helper body))
+       (define entry (make-node cnd))
+       (define es (list (make-edge entry (CFG-entry body-cfg))
+                        (make-edge (CFG-exit body-cfg) entry)))
+       (CFG entry entry
+            (cons entry (CFG-nodes body-cfg))
+            (append es (CFG-edges body-cfg)))]
+      [(Seq stmts)
+       (define cfgs (map cfg-helper stmts))
+       (define entry (CFG-entry (first cfgs)))
+       (define exit (CFG-exit (last cfgs)))
+       (define conns (for/list ([exit cfgs]
+                                [entry (cdr cfgs)])
+                       (make-edge (CFG-exit exit) (CFG-entry entry))))
+       (define all-nodes (foldl (λ (c acc) (append (CFG-nodes c) acc)) '() cfgs))
+       (define all-edges (foldl (λ (c acc) (append (CFG-edges c) acc)) '() cfgs))
+       (CFG entry exit all-nodes (append conns all-edges))]
+      [else (let ([n (make-node stmt)]) (CFG n n (list n) '()))]))
+  (cfg-helper stmt))
 
 (define (fun->cfg f)
   (stmt->cfg (Fun-body f)))
@@ -127,7 +136,7 @@
   (check-match (stmt->cfg (parse-stmt '{while {> 5 x} {:= x {+ x 1}}}))
                 (CFG
                  (Node (Greater 5 'x) _)
-                 (Node (Assign 'x (Plus 'x 1)) _)
+                 (Node (Greater 5 'x) _)
                  (list (Node (Greater 5 'x) _)
                        (Node (Assign 'x (Plus 'x 1)) _))
                  (list
@@ -138,7 +147,7 @@
                                                         {:= x {- x 1}}}}))
                 (CFG
                  (Node (Greater 5 'x) _)
-                 (Node (Assign 'x (Minus 'x 1)) _)
+                 (Node (Greater 5 'x) _)
                  (list
                   (Node (Greater 5 'x) _)
                   (Node (Assign 'x (Minus 'x 1)) _)
@@ -205,12 +214,10 @@
                                                  {:= x 5}}
                                              {:= x {- x 1}}}}))])
     (check-match (get-succs (CFG-exit cfg) cfg)
-                 (list (Node (Greater 5 'x) _)))
-    (check-match (get-preds (CFG-exit cfg) cfg)
-                 (list (Node (NoOp) _)))
-    (check-match (get-succs (CFG-entry cfg) cfg)
                  (list (Node (Equal 'x 3) _)))
-    (check-match (get-preds (car (get-preds (CFG-exit cfg) cfg)) cfg)
-                 (list (Node (Assign 'x 4) _)
-                       (Node (Assign 'x 5) _))))
+    (check-match (get-preds (CFG-exit cfg) cfg)
+                 (list (Node (Assign 'x (Minus 'x 1)) _)))
+    (check-match (get-succs (CFG-entry cfg) cfg)
+                 (list (Node (Equal 'x 3) _))))
+
   )

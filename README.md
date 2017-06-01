@@ -21,7 +21,7 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
 * `parser.rkt` function that parses s-exp based TIP to abstract syntax tree (AST).
 * `ast.rkt` the abstract syntax tree structure definitions.
 * `cfg.rkt` contrlo flow graph (CFG) structure definitions; CFG is transformed from AST.
-* `dfa.rkt` chaotic iteration framework algorithm.
+* `dfa.rkt` chaotic iteration framework and algorithm, which operates on CFG.
 * `reaching-def.rkt` reaching definition analysis.
 * `very-busy.rkt` very busy expressions analysis.
 

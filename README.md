@@ -6,7 +6,8 @@ An implementation of traditional dataflow analyses for an imperative language TI
 
 The TIP language is largely inspired from the lecture notes _Static Program Analysis_[1], but mixed with S-Expression syntax.
 
-** An Example **
+**An Example**
+
 ```
 {while {> 5 x}
   {{if {== x 3}

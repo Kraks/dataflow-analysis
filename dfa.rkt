@@ -40,8 +40,8 @@
     (when (not (empty? exit-fact))
       (hash-set! IN (CFG-exit cfg) (exit-fact fun cfg (CFG-exit cfg))))
 
-    ;?
     (hash-set! OUT (CFG-exit cfg) (set))
+    (hash-set! IN (CFG-entry cfg) (set))
     
     (define (loop IN OUT old-IN old-OUT)
       (for ([n (CFG-nodes cfg)])

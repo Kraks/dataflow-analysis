@@ -1,10 +1,19 @@
 ## Dataflow Analysis
 
-An implementation of traditional dataflow analysis for an imperative language TIP.
+An implementation of traditional dataflow analyses for an imperative language TIP.
 
 #### The TIP Language
 
 The TIP language is largely inspired from the lecture notes _Static Program Analysis_[1], but mixed with S-Expression syntax.
+
+** An Example **
+```
+{while {> 5 x}
+  {{if {== x 3}
+       {:= x 4}
+       {:= x 5}}
+   {:= x {- x 1}}}}
+```
 
 #### File Description
 

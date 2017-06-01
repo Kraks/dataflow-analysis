@@ -72,3 +72,18 @@ Program ::= Fun*
     [(AddrOf x) (eq? x var)]
     [(DeRef e) (expr-contains-var? e var)]
     [else #f]))
+
+(define (get-vars e)
+  (match e
+    [(? symbol? x) (set x)]
+    [(Plus l r) (set-union (get-vars l) (get-vars r))]
+    [(Minus l r) (set-union (get-vars l) (get-vars r))]
+    [(Mult l r) (set-union (get-vars l) (get-vars r))]
+    [(Div l r) (set-union (get-vars l) (get-vars r))]
+    [(Greater l r) (set-union (get-vars l) (get-vars r))]
+    [(Equal l r) (set-union (get-vars l) (get-vars r))]
+    ;; TODO: handle function pointers
+    [(App f args) (list->set (map get-vars args))]
+    [(AddrOf var) (set var)]
+    [(DeRef e) (get-vars e)]
+    [else (set)]))

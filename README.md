@@ -2,7 +2,7 @@
 
 An implementation of traditional dataflow analyses for an imperative language TIP.
 
-#### The TIP Language
+### The TIP Language
 
 The TIP language is largely inspired from the lecture notes _Static Program Analysis_[1], but mixed with S-Expression syntax.
 
@@ -16,7 +16,7 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
    {:= x {- x 1}}}}
 ```
 
-#### File Description
+### File Description
 
 * `parser.rkt` function that parses s-exp based TIP to abstract syntax tree (AST).
 * `ast.rkt` the abstract syntax tree structure definitions.
@@ -25,11 +25,11 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
 * `reaching-def.rkt` reaching definition analysis.
 * `very-busy.rkt` very busy expressions analysis.
 
-#### TODO
+### TODO
 
 * SSA-based analysis
 * Pointer analysis
 
-#### References
+### References
 
 [1] [Static Program Analysis](https://cs.au.dk/~amoeller/spa/)

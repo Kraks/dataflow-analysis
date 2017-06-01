@@ -11,16 +11,20 @@
 
 (define reaching-definitions-analysis
   (Analysis
+   ; direction
    'forward
+   ; init
    (λ (cfg node) (set))
+   ; entry fact
    (λ (fun cfg entry) (set))
-;             (for/set ([v (Fun-locals fun)])
-;               (cons v 'undefined)))
+   ; exit fact
    (λ (fun cfg exit) (set))
+   ; gen
    (λ (cfg n)
      (match n
        [(Node (Assign id val) label) (set (cons id label))]
        [else (set)]))
+   ; kill
    (λ (cfg n)
      (match n
        [(Node (Assign id val) label)
@@ -31,6 +35,7 @@
                                   (not (eq? (Node-label x) label))))
                       (CFG-nodes cfg))))]
        [else (set)]))
+   ; meet
    set-union))
 
 (define reaching-definitions

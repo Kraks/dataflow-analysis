@@ -25,6 +25,7 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
 * `reaching-def.rkt` reaching definition analysis.
 * `very-busy.rkt` very busy expressions analysis.
 * `available-expr.rkt` available expressions analysis.
+* `live-var.rkt` live variables analysis.
 
 ### TODO
 

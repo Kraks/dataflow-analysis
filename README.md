@@ -1,6 +1,6 @@
 ## Dataflow Analysis
 
-An implementation of traditional dataflow analyses for an imperative language TIP.
+A Racket implementation of traditional dataflow analyses for an imperative language TIP.
 
 ### The TIP Language
 

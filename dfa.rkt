@@ -51,8 +51,7 @@
                (hash-set! OUT n (set-union (set-subtract (hash-ref IN n) (kill cfg n)) (gen cfg n)))]
               [(eq? 'backward direction)
                (let ([succs (map (curry hash-ref IN) (get-succs n cfg))])
-                 (when (not (empty? succs))
-                   (hash-set! OUT n (apply meet succs))))
+                 (when (not (empty? succs)) (hash-set! OUT n (apply meet succs))))
                (hash-set! IN n (set-union (set-subtract (hash-ref OUT n) (kill cfg n)) (gen cfg n)))]
               [else (error "not a direction")]))
       

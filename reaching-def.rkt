@@ -1,5 +1,7 @@
 #lang racket
 
+;; Reaching Definition Analysis
+
 (require "ast.rkt")
 (require "parser.rkt")
 (require "cfg.rkt")
@@ -14,7 +16,7 @@
    (λ (fun cfg entry) (set))
 ;             (for/set ([v (Fun-locals fun)])
 ;               (cons v 'undefined)))
-   (λ (fun cfg entry) (set))
+   (λ (fun cfg exit) (set))
    (λ (cfg n)
      (match n
        [(Node (Assign id val) label) (set (cons id label))]

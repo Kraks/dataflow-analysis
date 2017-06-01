@@ -74,6 +74,24 @@
 (define (get-preds n cfg)
   (map Edge-from (filter (λ (e) (equal? (Edge-to e) n)) (CFG-edges cfg))))
 
+(define (get-exprs cfg)
+  (define (get-exprs-from-node n)
+    (match (Node-body n)
+      [(Output e) (list e)]
+      [(Return e) (list e)]
+      [(Assign id e) (list e)]
+      [(Plus l r) (Plus l r)]
+      [(Minus l r) (Minus l r)]
+      [(Mult l r) (Mult l r)]
+      [(Div l r) (Div l r)]
+      [(Greater l r) (Greater l r)]
+      [(Equal l r) (Equal l r)]
+      [(App f args) args]
+      [(AddrOf var) (AddrOf var)]
+      [(DeRef e) (DeRef e)]
+      [else (list)]))
+  (flatten (map get-exprs-from-node (CFG-nodes cfg))))
+
 (module+ test
   (check-match (stmt->cfg (parse-stmt '{:= a 3}))
                 (CFG (Node (Assign 'a 3) _)

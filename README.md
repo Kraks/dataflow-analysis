@@ -24,6 +24,7 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
 * `dfa.rkt` chaotic iteration framework and algorithm, which operates on CFG.
 * `reaching-def.rkt` reaching definition analysis.
 * `very-busy.rkt` very busy expressions analysis.
+* `available-expr.rkt` available expressions analysis.
 
 ### TODO
 

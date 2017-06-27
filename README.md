@@ -2,9 +2,9 @@
 
 A Racket implementation of traditional dataflow analyses for an imperative language TIP.
 
-### The TIP Language
+### Target: the TIP Language
 
-The TIP language is largely inspired from the lecture notes _Static Program Analysis_[1], but mixed with S-Expression syntax.
+These analyses are targeted for S-Expression based TIP language. The syntax is largely extracted from the great lecture notes _Static Program Analysis_[1].
 
 **An Example**
 
@@ -26,6 +26,8 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
 * `very-busy.rkt` very busy expressions analysis.
 * `available-expr.rkt` available expressions analysis.
 * `live-var.rkt` live variables analysis.
+
+See test cases in each files.
 
 ### TODO
 

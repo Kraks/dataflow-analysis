@@ -16,7 +16,7 @@ The TIP language is largely inspired from the lecture notes _Static Program Anal
    {:= x {- x 1}}}}
 ```
 
-### File Description
+### File Descriptions
 
 * `parser.rkt` functions that parse s-exp based TIP to abstract syntax tree (AST).
 * `ast.rkt` the abstract syntax tree structure definitions.
